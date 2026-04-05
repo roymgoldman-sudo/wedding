@@ -713,12 +713,10 @@
         </div>
         <div style="padding: 0 22px 8px; font-size:12px; color:var(--muted);">תצוגה מקדימה:</div>
         <div class="wa-preview" id="wa-preview-live" style="margin: 0 22px 16px;"></div>
-        <div style="padding: 0 22px 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-          <button class="btn btn-dark" onclick="sendRemindersNow()">שלח עכשיו לכל המאשרים (<span id="send-count">0</span>)</button>
-          <button id="next-reminder-btn" class="btn btn-green" onclick="sendNextReminder()" style="display:none;">הבא</button>
-          <button class="btn" onclick="showPanel('guests')">צפה ברשימת מאשרים</button>
+        <div style="padding: 0 22px 20px;">
+          <button class="btn btn-dark" onclick="buildWALinks()">הצג קישורים לשליחה (<span id="send-count">0</span>)</button>
         </div>
-        <div id="send-step-box" style="display:none;"></div>
+        <div id="wa-links-box" style="display:none; padding: 0 22px 20px;"></div>
         <div id="send-result" style="display:none; margin: 0 22px 16px;" class="alert alert-success"></div>
       </div>
 
@@ -1230,50 +1228,27 @@ function initReminderMsg() {
   if (sc) sc.textContent = confirmed.length;
 }
 
-let _sendQueue = [];
-let _sendIndex = 0;
-
-function sendRemindersNow() {
+function buildWALinks() {
   const confirmed = guests.filter(g => g.status === 'yes' && g.phone);
   if (confirmed.length === 0) {
     showToast('אין אורחים שאישרו עם מספר טלפון');
     return;
   }
-  _sendQueue = confirmed;
-  _sendIndex = 0;
-  renderSendCard();
-}
-
-function renderSendCard() {
-  if (_sendIndex >= _sendQueue.length) {
-    const r = document.getElementById('send-result');
-    r.style.display = 'block';
-    r.textContent = `✓ סיימת לשלוח לכל ${_sendQueue.length} האורחים!`;
-    document.getElementById('send-step-box').style.display = 'none';
-    return;
-  }
-  const g = _sendQueue[_sendIndex];
   const template = getReminderMsg();
-  const msg = template.replace('[שם]', g.name);
-  const phone = g.phone.replace(/[-\s]/g, '');
-  const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
-  const url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
-
-  const box = document.getElementById('send-step-box');
+  const box = document.getElementById('wa-links-box');
   box.style.display = 'block';
-  box.innerHTML = `
-    <div style="background:var(--gold-pale); border:1px solid rgba(184,149,74,0.3); border-radius:12px; padding:16px 20px; margin: 0 22px 16px;">
-      <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">שולח ל ${_sendIndex+1} מתוך ${_sendQueue.length}</div>
-      <div style="font-size:16px; font-weight:500; color:var(--dark); margin-bottom:12px;">${g.name}</div>
-      <a href="${url}" target="_blank" style="display:inline-block; background:#25D366; color:#fff; padding:11px 24px; border-radius:9px; font-size:14px; font-weight:500; text-decoration:none; margin-bottom:12px;">
-        📱 פתח WhatsApp ושלח
-      </a>
-      <br>
-      <button onclick="renderSendCard()" style="margin-top:8px; font-size:13px; padding:9px 20px; border-radius:9px; border:1px solid var(--border); background:#fff; cursor:pointer; font-family:'Heebo',sans-serif; color:var(--text);">
-        ${_sendIndex + 1 < _sendQueue.length ? `✓ שלחתי — הבא: ${_sendQueue[_sendIndex+1].name}` : '✓ שלחתי — סיום'}
-      </button>
-    </div>`;
-  _sendIndex++;
+  box.innerHTML = '<div style="font-size:12px; color:var(--muted); margin-bottom:12px;">לחץ על כל קישור לשליחה ב-WhatsApp:</div>' +
+    confirmed.map(g => {
+      const msg = template.replace('[שם]', g.name);
+      const phone = g.phone.replace(/[-\s]/g, '');
+      const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
+      const url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+      return `<a href="${url}" target="_blank" style="display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:8px; background:#F0FBF4; border:1px solid #B8D9C0; border-radius:10px; text-decoration:none; color:#2D5A3D;">
+        <span style="font-size:18px;">📱</span>
+        <span style="font-weight:500; font-size:14px;">${g.name}</span>
+        <span style="font-size:12px; color:#5A8A6A; margin-right:auto;">${g.phone}</span>
+      </a>`;
+    }).join('');
 }
 
 function exportCSV() {
