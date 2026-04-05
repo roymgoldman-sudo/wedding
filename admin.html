@@ -961,7 +961,7 @@ function showPanel(name) {
   });
   document.getElementById('panel-title').textContent = panelTitles[name];
   if (name === 'settings') loadSettingsToForm();
-  else if (name === 'reminders') { renderAll(); setTimeout(initReminderMsg, 100); }
+  else if (name === 'reminders') { renderAll(); setTimeout(() => { initReminderMsg(); updateSendCount(); }, 100); }
   else renderAll();
 
 }
@@ -1223,15 +1223,19 @@ function initReminderMsg() {
   if (!el) return;
   el.value = getReminderMsg();
   updateWAPreview();
-  const confirmed = guests.filter(g => g.status === 'yes' && g.phone);
+  updateSendCount();
+}
+
+function updateSendCount() {
+  const confirmed = guests.filter(g => g.status === 'yes');
   const sc = document.getElementById('send-count');
   if (sc) sc.textContent = confirmed.length;
 }
 
 function buildWALinks() {
-  const confirmed = guests.filter(g => g.status === 'yes' && g.phone);
+  const confirmed = guests.filter(g => g.status === 'yes');
   if (confirmed.length === 0) {
-    showToast('אין אורחים שאישרו עם מספר טלפון');
+    showToast('אין אורחים שאישרו הגעה');
     return;
   }
   const template = getReminderMsg();
@@ -1240,9 +1244,10 @@ function buildWALinks() {
   box.innerHTML = '<div style="font-size:12px; color:var(--muted); margin-bottom:12px;">לחץ על כל קישור לשליחה ב-WhatsApp:</div>' +
     confirmed.map(g => {
       const msg = template.replace('[שם]', g.name);
-      const phone = g.phone.replace(/[-\s]/g, '');
+      const phone = (g.phone || '').replace(/[-\s]/g, '');
       const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
-      const url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+      const url = num ? 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg) : null;
+      if (!url) return `<div style="display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:8px; background:#FDF2F2; border:1px solid #F0C0C0; border-radius:10px; color:#8B3330; font-size:13px;">⚠ ${g.name} — אין מספר טלפון</div>`;
       return `<a href="${url}" target="_blank" style="display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:8px; background:#F0FBF4; border:1px solid #B8D9C0; border-radius:10px; text-decoration:none; color:#2D5A3D;">
         <span style="font-size:18px;">📱</span>
         <span style="font-weight:500; font-size:14px;">${g.name}</span>
