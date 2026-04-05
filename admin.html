@@ -1241,19 +1241,48 @@ function buildWALinks() {
   const template = getReminderMsg();
   const box = document.getElementById('wa-links-box');
   box.style.display = 'block';
-  box.innerHTML = '<div style="font-size:12px; color:var(--muted); margin-bottom:12px;">לחץ על כל קישור לשליחה ב-WhatsApp:</div>' +
-    confirmed.map(g => {
-      const msg = template.replace('[שם]', g.name);
-      const phone = String(g.phone || '').replace(/[-\s]/g, '');
-      const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
-      const url = num ? 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg) : null;
-      if (!url) return `<div style="display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:8px; background:#FDF2F2; border:1px solid #F0C0C0; border-radius:10px; color:#8B3330; font-size:13px;">⚠ ${g.name} — אין מספר טלפון</div>`;
-      return `<a href="${url}" target="_blank" style="display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:8px; background:#F0FBF4; border:1px solid #B8D9C0; border-radius:10px; text-decoration:none; color:#2D5A3D;">
-        <span style="font-size:18px;">📱</span>
-        <span style="font-weight:500; font-size:14px;">${g.name}</span>
-        <span style="font-size:12px; color:#5A8A6A; margin-right:auto;">${g.phone}</span>
-      </a>`;
-    }).join('');
+
+  let current = 0;
+
+  function showNext() {
+    if (current >= confirmed.length) {
+      box.innerHTML = `<div style="background:#F0F7F2; border:1px solid #B8D9C0; border-radius:12px; padding:20px; text-align:center;">
+        <div style="font-size:24px; margin-bottom:8px;">🎉</div>
+        <div style="font-size:15px; font-weight:500; color:#2D5A3D;">סיימת! נשלחו תזכורות לכל ${confirmed.length} האורחים</div>
+      </div>`;
+      return;
+    }
+
+    const g = confirmed[current];
+    const msg = template.replace('[שם]', g.name);
+    const phone = String(g.phone || '').replace(/[-\s]/g, '');
+    const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
+    const url = num ? 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg) : null;
+
+    box.innerHTML = `
+      <div style="background:var(--gold-pale); border:1px solid rgba(184,149,74,0.3); border-radius:12px; padding:20px 22px;">
+        <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">${current + 1} מתוך ${confirmed.length}</div>
+        <div style="background:#E8E0D4; border-radius:6px; height:6px; margin-bottom:14px;">
+          <div style="background:var(--gold); height:6px; border-radius:6px; width:${Math.round((current/confirmed.length)*100)}%;"></div>
+        </div>
+        <div style="font-size:17px; font-weight:500; color:var(--dark); margin-bottom:4px;">${g.name}</div>
+        <div style="font-size:13px; color:var(--muted); margin-bottom:16px;">${g.phone || 'אין טלפון'}</div>
+        ${url
+          ? `<a href="${url}" target="_blank" onclick="setTimeout(advance, 1500)" style="display:inline-block; background:#25D366; color:#fff; padding:12px 28px; border-radius:9px; font-size:14px; font-weight:500; text-decoration:none; margin-left:10px;">📱 שלח ב-WhatsApp</a>`
+          : `<div style="color:#8B3330; font-size:13px; margin-bottom:8px;">⚠ אין מספר טלפון</div>`
+        }
+        <button onclick="advance()" style="padding:12px 20px; border-radius:9px; border:1px solid var(--border); background:#fff; cursor:pointer; font-family:'Heebo',sans-serif; font-size:14px; color:var(--text);">
+          ${url ? 'דלג →' : 'הבא →'}
+        </button>
+      </div>`;
+
+    window.advance = function() {
+      current++;
+      showNext();
+    };
+  }
+
+  showNext();
 }
 
 function exportCSV() {
