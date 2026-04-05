@@ -379,7 +379,7 @@
 <div class="page">
   <div class="header">
     <div class="header-label">הזמנה לחגיגת נישואין</div>
-    <h1 class="couple-names">נועה<br><em>&</em><br>עומר</h1>
+    <h1 class="couple-names">אליה<br><em>&</em><br>אחינעם</h1>
     <div class="event-details">
       יום ראשון, ט״ו בסיוון תשפ״ה<br>
       15 ביוני 2025 &bull; 19:00<br>
@@ -476,7 +476,7 @@
   </div>
 
   <div class="footer">
-    NOAM & OMER &bull; 15.06.2025
+    ELIYA & ACHINOAM &bull; 15.06.2025
   </div>
 </div>
 
@@ -553,7 +553,7 @@
 
     // ===== שמירה ב-Google Sheets =====
     // החלף את ה-URL הזה ב-URL שתקבל מ-Google Apps Script
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzH7rbw4sdYwT8yPQhdK7qxumbyC97g0n6gT6KYo08QPKrIpWoXBBLDeXjUa32w7rGR4A/exec';
+    const SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
 
     fetch(SCRIPT_URL, {
       method: 'POST',
@@ -572,7 +572,7 @@
       document.getElementById('success-icon').textContent = '🎊';
       document.getElementById('success-title').textContent = 'מחכים לראות אותך!';
       document.getElementById('success-msg').innerHTML =
-        `<strong>${name}</strong>, אישרת הגעה לחתונה של נועה ועומר!<br><br>` +
+        `<strong>${name}</strong>, אישרת הגעה לחתונה של אליה ואחינעם!<br><br>` +
         `מספר מגיעים: <strong>${guestCount}</strong><br>` +
         (allergies.length && allergies[0] !== 'ללא' ? `אלרגיות: <strong>${allergies.join(', ')}</strong><br>` : '') +
         `<br>נשמח לראותך ב-15 ביוני 💛`;
