@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הזמנה לחתונה</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Heebo:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --gold: #B8954A;
+    --gold-light: #D4B483;
+    --gold-pale: #F5EDD8;
+    --dark: #1C1714;
+    --cream: #FAF7F2;
+    --text: #3A3128;
+    --muted: #8A7D70;
+  }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(184,149,74,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(184,149,74,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .header-label {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .couple-names {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 10vw, 64px);
+    font-weight: 300;
+    color: var(--dark);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .couple-names em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .event-details {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-light));
+  }
+
+  .divider::after {
+    background: linear-gradient(to left, transparent, var(--gold-light));
+  }
+
+  .divider-diamond {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* Invitation text */
+  .invite-text {
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--muted);
+    margin-bottom: 36px;
+  }
+
+  .invite-text strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Guest name display */
+  .guest-greeting {
+    text-align: center;
+    background: var(--gold-pale);
+    border: 1px solid rgba(184,149,74,0.25);
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin-bottom: 32px;
+  }
+
+  .guest-greeting .label { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
+  .guest-greeting .name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--dark); margin-top: 4px; }
+
+  /* Form card */
+  .form-card {
+    background: #fff;
+    border: 1px solid rgba(184,149,74,0.2);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 40px rgba(28,23,20,0.06);
+  }
+
+  .form-section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+  }
+
+  /* RSVP choice */
+  .rsvp-choice {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .choice-btn {
+    padding: 14px;
+    border-radius: 10px;
+    border: 1.5px solid #E8E0D4;
+    background: #fff;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: 'Heebo', sans-serif;
+  }
+
+  .choice-btn .icon { font-size: 22px; display: block; margin-bottom: 6px; }
+  .choice-btn .label { font-size: 14px; font-weight: 500; color: var(--text); display: block; }
+  .choice-btn .sub { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+
+  .choice-btn:hover { border-color: var(--gold-light); background: var(--gold-pale); }
+  .choice-btn.active-yes { border-color: #4A7C59; background: #F0F7F2; }
+  .choice-btn.active-yes .label { color: #2D5A3D; }
+  .choice-btn.active-no { border-color: #B85450; background: #FDF2F2; }
+  .choice-btn.active-no .label { color: #8B3330; }
+
+  /* Form fields */
+  .field-group { margin-bottom: 18px; }
+
+  .field-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 7px;
+    letter-spacing: 0.03em;
+  }
+
+  .field-group input,
+  .field-group select,
+  .field-group textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #E8E0D4;
+    border-radius: 9px;
+    font-size: 14px;
+    font-family: 'Heebo', sans-serif;
+    color: var(--text);
+    background: #fff;
+    transition: border-color 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .field-group input:focus,
+  .field-group select:focus,
+  .field-group textarea:focus {
+    border-color: var(--gold-light);
+  }
+
+  .field-group textarea { resize: vertical; min-height: 80px; }
+
+  /* Count selector */
+  .count-selector {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1.5px solid #E8E0D4;
+    border-radius: 9px;
+    overflow: hidden;
+  }
+
+  .count-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: var(--gold-pale);
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--gold);
+    font-weight: 300;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+
+  .count-btn:hover { background: #EDE0C4; }
+
+  .count-display {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 500;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--dark);
+    border: none;
+    border-right: 1.5px solid #E8E0D4;
+    border-left: 1.5px solid #E8E0D4;
+    background: #fff;
+    height: 44px;
+    line-height: 44px;
+  }
+
+  /* Allergy chips */
+  .allergy-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .allergy-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #E8E0D4;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #fff;
+    color: var(--muted);
+    font-family: 'Heebo', sans-serif;
+  }
+
+  .allergy-chip.selected {
+    border-color: #B86F4A;
+    background: #FDF3EE;
+    color: #8B4520;
+  }
+
+  /* Submit button */
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--dark);
+    color: var(--gold-light);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .submit-btn:hover { background: #2C2420; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(28,23,20,0.2); }
+  .submit-btn:active { transform: translateY(0); }
+
+  /* Hidden sections */
+  .extra-fields { display: none; }
+  .extra-fields.show { display: block; animation: fadeUp 0.4s ease both; }
+
+  /* Success screen */
+  #success-screen {
+    display: none;
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .success-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    display: block;
+    animation: pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both;
+  }
+
+  @keyframes pop {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--dark);
+    margin-bottom: 12px;
+  }
+
+  .success-msg {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .success-msg strong { color: var(--text); font-weight: 500; }
+
+  .whatsapp-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 12px 20px;
+    background: #E8F5E9;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #2E7D32;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 11px;
+    color: rgba(138,125,112,0.5);
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 480px) {
+    .form-card { padding: 24px 20px; }
+    .page { padding: 24px 16px 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-label">הזמנה לחגיגת נישואין</div>
+    <h1 class="couple-names">נועה<br><em>&</em><br>עומר</h1>
+    <div class="event-details">
+      יום ראשון, ט״ו בסיוון תשפ״ה<br>
+      15 ביוני 2025 &bull; 19:00<br>
+      אולם המגדל, תל אביב
+    </div>
+  </div>
+
+  <div class="divider"><div class="divider-diamond"></div></div>
+
+  <div class="invite-text">
+    שמחנו להזמין אותך לחגוג יחד איתנו<br>
+    את <strong>יום השמחה הגדול שלנו</strong>.<br>
+    נשמח לראותך!<br><br>
+    אנא אשר/י הגעה עד <strong>1 ביוני 2025</strong>
+  </div>
+
+  <div id="guest-greeting" class="guest-greeting" style="display:none;">
+    <div class="label">הוזמנת/‍ה</div>
+    <div class="name" id="guest-name-display"></div>
+  </div>
+
+  <div class="form-card" id="rsvp-form">
+    <div class="form-section-title">האם תגיע/י לאירוע?</div>
+    <div class="rsvp-choice">
+      <button class="choice-btn" id="btn-yes" onclick="selectAnswer('yes')">
+        <span class="icon">🥂</span>
+        <span class="label">כן, אגיע!</span>
+        <span class="sub">שמח/ה להיות שם</span>
+      </button>
+      <button class="choice-btn" id="btn-no" onclick="selectAnswer('no')">
+        <span class="icon">💌</span>
+        <span class="label">לא אוכל להגיע</span>
+        <span class="sub">מצטער/ת</span>
+      </button>
+    </div>
+
+    <div class="extra-fields" id="fields-yes">
+      <div class="field-group">
+        <label>שמך המלא</label>
+        <input type="text" id="guest-name" placeholder="ישראל ישראלי" autocomplete="name">
+      </div>
+      <div class="field-group">
+        <label>מספר טלפון (לתזכורת WhatsApp)</label>
+        <input type="tel" id="guest-phone" placeholder="050-0000000" autocomplete="tel">
+      </div>
+      <div class="field-group">
+        <label>כמה אנשים מגיעים (כולל אתך)?</label>
+        <div class="count-selector">
+          <button class="count-btn" onclick="changeCount(-1)">−</button>
+          <div class="count-display" id="count-display">1</div>
+          <button class="count-btn" onclick="changeCount(1)">+</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>אלרגיות למזון</label>
+        <div class="allergy-chips">
+          <button class="allergy-chip" onclick="toggleAllergy(this)">ללא אלרגיות</button>
+          <button class="allergy-chip" onclick="toggleAllergy(this)">גלוטן</button>
+          <button class="allergy-chip" onclick="toggleAllergy(this)">חלב</button>
+          <button class="allergy-chip" onclick="toggleAllergy(this)">בוטנים</button>
+          <button class="allergy-chip" onclick="toggleAllergy(this)">ביצים</button>
+          <button class="allergy-chip" onclick="toggleAllergy(this)">טבעוני</button>
+          <button class="allergy-chip" onclick="toggleAllergy(this)">צמחוני</button>
+          <button class="allergy-chip" onclick="toggleAllergy(this)">כשר למהדרין</button>
+        </div>
+        <input type="text" id="allergy-other" placeholder="אחר — פרט/י כאן...">
+      </div>
+      <button class="submit-btn" onclick="submitRSVP('yes')">✓ אשר הגעה לאירוע</button>
+    </div>
+
+    <div class="extra-fields" id="fields-no">
+      <div class="field-group">
+        <label>שמך המלא</label>
+        <input type="text" id="guest-name-no" placeholder="ישראל ישראלי">
+      </div>
+      <div class="field-group">
+        <label>הודעה לזוג (אופציונלי)</label>
+        <textarea id="no-message" placeholder="נשמח לשמוע ממך... ✨"></textarea>
+      </div>
+      <button class="submit-btn" style="background:#5A4A3A;" onclick="submitRSVP('no')">שלח תגובה</button>
+    </div>
+  </div>
+
+  <div id="success-screen">
+    <div class="form-card" style="padding: 40px 32px;">
+      <span class="success-icon" id="success-icon">🎊</span>
+      <div class="success-title" id="success-title">תודה!</div>
+      <div class="success-msg" id="success-msg"></div>
+      <div class="whatsapp-notice" id="whatsapp-notice" style="display:none;">
+        <span>📱</span>
+        <span>תקבל/י תזכורת ב-WhatsApp לפני האירוע</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    NOAM & OMER &bull; 15.06.2025
+  </div>
+</div>
+
+<script>
+  let guestCount = 1;
+  let selectedAnswer = null;
+  let selectedAllergies = [];
+
+  // Read guest name from URL: rsvp.html?guest=שם+האורח
+  const urlParams = new URLSearchParams(window.location.search);
+  const guestNameParam = urlParams.get('guest');
+  if (guestNameParam) {
+    document.getElementById('guest-greeting').style.display = 'block';
+    document.getElementById('guest-name-display').textContent = decodeURIComponent(guestNameParam);
+    document.getElementById('guest-name').value = decodeURIComponent(guestNameParam);
+    document.getElementById('guest-name-no').value = decodeURIComponent(guestNameParam);
+  }
+
+  function selectAnswer(answer) {
+    selectedAnswer = answer;
+    document.getElementById('btn-yes').className = 'choice-btn' + (answer === 'yes' ? ' active-yes' : '');
+    document.getElementById('btn-no').className = 'choice-btn' + (answer === 'no' ? ' active-no' : '');
+    document.getElementById('fields-yes').className = 'extra-fields' + (answer === 'yes' ? ' show' : '');
+    document.getElementById('fields-no').className = 'extra-fields' + (answer === 'no' ? ' show' : '');
+  }
+
+  function changeCount(delta) {
+    guestCount = Math.max(1, Math.min(10, guestCount + delta));
+    document.getElementById('count-display').textContent = guestCount;
+  }
+
+  function toggleAllergy(btn) {
+    btn.classList.toggle('selected');
+    const text = btn.textContent;
+    if (btn.classList.contains('selected')) {
+      if (text === 'ללא אלרגיות') {
+        document.querySelectorAll('.allergy-chip').forEach(c => {
+          if (c !== btn) c.classList.remove('selected');
+        });
+        selectedAllergies = ['ללא'];
+      } else {
+        document.querySelectorAll('.allergy-chip').forEach(c => {
+          if (c.textContent === 'ללא אלרגיות') c.classList.remove('selected');
+        });
+        selectedAllergies = selectedAllergies.filter(a => a !== 'ללא');
+        selectedAllergies.push(text);
+      }
+    } else {
+      selectedAllergies = selectedAllergies.filter(a => a !== text);
+    }
+  }
+
+  function submitRSVP(answer) {
+    const name = answer === 'yes'
+      ? document.getElementById('guest-name').value.trim()
+      : document.getElementById('guest-name-no').value.trim();
+
+    if (!name) { alert('אנא הכנס/י את שמך'); return; }
+
+    const phone = answer === 'yes' ? document.getElementById('guest-phone').value.trim() : '';
+    const allergyOther = answer === 'yes' ? document.getElementById('allergy-other').value.trim() : '';
+    const allergies = [...selectedAllergies];
+    if (allergyOther) allergies.push(allergyOther);
+
+    const data = {
+      name,
+      phone,
+      answer,
+      count: answer === 'yes' ? guestCount : 0,
+      allergies: allergies.join(', '),
+      message: answer === 'no' ? document.getElementById('no-message').value.trim() : '',
+      timestamp: new Date().toISOString()
+    };
+
+    // ===== שמירה ב-Google Sheets =====
+    // החלף את ה-URL הזה ב-URL שתקבל מ-Google Apps Script
+    const SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).catch(() => {}); // no-cors returns opaque, so we ignore error
+
+    // Show success
+    document.getElementById('rsvp-form').style.display = 'none';
+    const s = document.getElementById('success-screen');
+    s.style.display = 'block';
+    s.style.animation = 'fadeUp 0.5s ease both';
+
+    if (answer === 'yes') {
+      document.getElementById('success-icon').textContent = '🎊';
+      document.getElementById('success-title').textContent = 'מחכים לראות אותך!';
+      document.getElementById('success-msg').innerHTML =
+        `<strong>${name}</strong>, אישרת הגעה לחתונה של נועה ועומר!<br><br>` +
+        `מספר מגיעים: <strong>${guestCount}</strong><br>` +
+        (allergies.length && allergies[0] !== 'ללא' ? `אלרגיות: <strong>${allergies.join(', ')}</strong><br>` : '') +
+        `<br>נשמח לראותך ב-15 ביוני 💛`;
+      if (phone) document.getElementById('whatsapp-notice').style.display = 'flex';
+    } else {
+      document.getElementById('success-icon').textContent = '💌';
+      document.getElementById('success-title').textContent = 'תודה על התגובה';
+      document.getElementById('success-msg').innerHTML =
+        `<strong>${name}</strong>, מצטערים שלא תוכל/י להגיע.<br><br>נחשוב עליך ביום המיוחד! 💛`;
+    }
+  }
+</script>
+</body>
+</html>

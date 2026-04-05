@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ניהול חתונה — נועה ועומר</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Heebo:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #B8954A;
+    --gold-light: #D4B483;
+    --gold-pale: #F5EDD8;
+    --dark: #1C1714;
+    --cream: #FAF7F2;
+    --text: #3A3128;
+    --muted: #8A7D70;
+    --border: #E8E0D4;
+    --sidebar-w: 220px;
+  }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Login screen */
+  #login-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .login-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 340px;
+    text-align: center;
+  }
+
+  .login-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+
+  .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+  .login-box input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Heebo', sans-serif;
+    margin-bottom: 12px;
+    outline: none;
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .login-box input:focus { border-color: var(--gold-light); }
+
+  .login-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--dark);
+    color: var(--gold-light);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Heebo', sans-serif;
+    cursor: pointer;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    transition: background 0.2s;
+  }
+  .login-btn:hover { background: #2C2420; }
+  .login-error { color: #B85450; font-size: 12px; margin-top: 8px; display: none; }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--dark);
+    min-height: 100vh;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .sidebar-logo .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--gold-light);
+    line-height: 1.2;
+  }
+
+  .sidebar-logo .date {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .nav { padding: 16px 0; flex: 1; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-right: 3px solid transparent;
+  }
+
+  .nav-item:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--gold-light); border-right-color: var(--gold); background: rgba(184,149,74,0.08); }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* Main content */
+  .main {
+    margin-right: var(--sidebar-w);
+    flex: 1;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .topbar-title { font-size: 15px; font-weight: 500; color: var(--text); }
+  .topbar-actions { display: flex; gap: 10px; }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    transition: all 0.15s;
+    font-weight: 400;
+  }
+  .btn:hover { background: var(--gold-pale); border-color: var(--gold-light); }
+  .btn-dark { background: var(--dark); color: var(--gold-light); border-color: var(--dark); }
+  .btn-dark:hover { background: #2C2420; }
+  .btn-green { background: #2E7D32; color: #fff; border-color: #2E7D32; }
+  .btn-green:hover { background: #1B5E20; }
+
+  .content { padding: 32px; }
+
+  /* Panel switching */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Stats */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+
+  .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 8px; }
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 300; color: var(--dark); line-height: 1; }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .stat-card.yes .stat-num { color: #2D5A3D; }
+  .stat-card.no .stat-num { color: #8B3330; }
+  .stat-card.pending .stat-num { color: #8B6320; }
+
+  /* Card */
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title { font-size: 14px; font-weight: 500; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 16px;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(245,237,216,0.3); }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .status-yes { background: #F0F7F2; color: #2D5A3D; }
+  .status-no { background: #FDF2F2; color: #8B3330; }
+  .status-pending { background: #FEF9EE; color: #8B6320; }
+
+  .allergy-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #FDF3EE;
+    color: #8B4520;
+    border-radius: 10px;
+    font-size: 11px;
+    margin: 1px;
+  }
+
+  /* Add guest form */
+  .add-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+    padding: 16px 22px;
+    background: var(--gold-pale);
+    border-top: 1px solid var(--border);
+  }
+
+  .add-form .field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; }
+  .add-form input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    background: #fff;
+    outline: none;
+    color: var(--text);
+  }
+  .add-form input:focus { border-color: var(--gold-light); }
+
+  /* Filters */
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Heebo', sans-serif;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .filter-btn.active { background: var(--dark); color: var(--gold-light); border-color: var(--dark); }
+  .filter-btn:hover:not(.active) { border-color: var(--gold-light); }
+
+  /* Search */
+  .search-input {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    outline: none;
+    width: 200px;
+    background: #fff;
+    color: var(--text);
+  }
+  .search-input:focus { border-color: var(--gold-light); }
+
+  /* Link generator */
+  .link-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .link-url {
+    flex: 1;
+    font-size: 12px;
+    color: var(--muted);
+    direction: ltr;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Reminders */
+  .reminder-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .reminder-item:last-child { border-bottom: none; }
+  .reminder-title { font-size: 14px; font-weight: 500; }
+  .reminder-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  /* Toggle */
+  .toggle {
+    width: 42px;
+    height: 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: var(--gold); }
+  .toggle.off { background: #D4CDC6; }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    top: 3px;
+    transition: right 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle.on::after { right: 21px; }
+  .toggle.off::after { right: 3px; }
+
+  /* Allergies overview */
+  .allergy-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px 22px;
+  }
+  .allergy-block {
+    background: #FDF3EE;
+    border: 1px solid #F0D5C4;
+    border-radius: 12px;
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 110px;
+  }
+  .allergy-block .count { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: #8B4520; }
+  .allergy-block .name { font-size: 12px; color: #8B4520; margin-top: 2px; }
+
+  /* Message preview */
+  .wa-preview {
+    background: #E8F5E9;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #1B5E20;
+    direction: rtl;
+    border-radius: 0 12px 12px 12px;
+    margin: 0 22px 16px;
+    max-width: 340px;
+  }
+
+  .action-link {
+    color: var(--gold);
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--dark);
+    color: var(--gold-light);
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 13px;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Alert */
+  .alert { padding: 10px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; }
+  .alert-success { background: #F0F7F2; color: #2D5A3D; border: 1px solid #B8D9C0; }
+
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .add-form { grid-template-columns: 1fr 1fr; }
+    .sidebar { display: none; }
+    .main { margin-right: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">לוח ניהול החתונה</div>
+    <div class="login-sub">נועה ועומר &bull; 15.06.2025</div>
+    <input type="password" id="login-pass" placeholder="סיסמה" onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="login-btn" onclick="doLogin()">כניסה</button>
+    <div class="login-error" id="login-error">סיסמה שגויה</div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="title">נועה ועומר</div>
+    <div class="date">15 ביוני 2025</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="showPanel('dashboard')">
+      <span class="icon">◇</span> לוח בקרה
+    </div>
+    <div class="nav-item" onclick="showPanel('guests')">
+      <span class="icon">◻</span> רשימת אורחים
+    </div>
+    <div class="nav-item" onclick="showPanel('allergies')">
+      <span class="icon">◈</span> אלרגיות
+    </div>
+    <div class="nav-item" onclick="showPanel('links')">
+      <span class="icon">⟐</span> קישורי הזמנה
+    </div>
+    <div class="nav-item" onclick="showPanel('reminders')">
+      <span class="icon">◉</span> תזכורות
+    </div>
+  </nav>
+  <div class="sidebar-footer">Admin Panel v1.0</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="panel-title">לוח בקרה</div>
+    <div class="topbar-actions">
+      <button class="btn" onclick="exportCSV()">יצוא Excel</button>
+      <button class="btn btn-dark" onclick="showPanel('links')">+ הוסף אורח</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">ממתינים לאישור</div>
+          <span style="font-size:12px; color:var(--muted);" id="pending-count"></span>
+        </div>
+        <table>
+          <thead><tr><th>שם</th><th>טלפון</th><th>פעולה</th></tr></thead>
+          <tbody id="pending-table"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">אירוע בקצרה</div></div>
+        <div style="padding: 20px 22px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+          <div>
+            <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">תאריך</div>
+            <div style="font-size:14px; font-weight:500;">15 יוני 2025</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">שעה</div>
+            <div style="font-size:14px; font-weight:500;">19:00</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">מקום</div>
+            <div style="font-size:14px; font-weight:500;">אולם המגדל</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">סגירת RSVP</div>
+            <div style="font-size:14px; font-weight:500;">1 יוני 2025</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">מגיעים</div>
+            <div style="font-size:14px; font-weight:500;" id="total-coming">0 אורחים</div>
+          </div>
+          <div>
+            <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">אלרגיות</div>
+            <div style="font-size:14px; font-weight:500;" id="total-allergies">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GUESTS -->
+    <div class="panel" id="panel-guests">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div class="filters">
+          <button class="filter-btn active" onclick="filterGuests('all', this)">הכל</button>
+          <button class="filter-btn" onclick="filterGuests('yes', this)">אישרו</button>
+          <button class="filter-btn" onclick="filterGuests('no', this)">לא מגיעים</button>
+          <button class="filter-btn" onclick="filterGuests('pending', this)">ממתינים</button>
+        </div>
+        <input class="search-input" type="text" placeholder="חיפוש שם..." oninput="searchGuests(this.value)">
+      </div>
+
+      <div id="add-alert" style="display:none;" class="alert alert-success"></div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>שם</th>
+              <th>טלפון</th>
+              <th>סטטוס</th>
+              <th>מגיעים</th>
+              <th>אלרגיות</th>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+          <tbody id="guest-table"></tbody>
+        </table>
+        <div class="add-form">
+          <div class="field">
+            <label>שם</label>
+            <input type="text" id="new-name" placeholder="ישראל ישראלי">
+          </div>
+          <div class="field">
+            <label>טלפון</label>
+            <input type="tel" id="new-phone" placeholder="050-0000000">
+          </div>
+          <div class="field">
+            <label>הערה</label>
+            <input type="text" id="new-note" placeholder="כשר, VIP...">
+          </div>
+          <button class="btn btn-dark" onclick="addGuest()">+ הוסף</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALLERGIES -->
+    <div class="panel" id="panel-allergies">
+      <div class="card">
+        <div class="card-header"><div class="card-title">סיכום אלרגיות ודרישות מזון</div></div>
+        <div class="allergy-summary" id="allergy-summary"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">רשימה מפורטת לטבח</div></div>
+        <table>
+          <thead><tr><th>שם</th><th>אלרגיות / דרישות</th><th>מגיעים</th></tr></thead>
+          <tbody id="allergy-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LINKS -->
+    <div class="panel" id="panel-links">
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header"><div class="card-title">הפקת קישור אישי</div></div>
+        <div style="padding: 20px 22px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
+            <div>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:5px;">שם האורח</label>
+              <input type="text" id="link-name" placeholder="נועה כהן" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:'Heebo',sans-serif; outline:none; color:var(--text);">
+            </div>
+            <div>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:5px;">טלפון (אופציונלי)</label>
+              <input type="tel" id="link-phone" placeholder="050-0000000" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:'Heebo',sans-serif; outline:none; color:var(--text);">
+            </div>
+            <button class="btn btn-dark" onclick="generateLink()">הפק קישור</button>
+          </div>
+          <div id="link-result" style="display:none; margin-top:14px;">
+            <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">קישור RSVP אישי:</div>
+            <div class="link-box">
+              <div class="link-url" id="link-url"></div>
+              <button class="btn btn-dark" onclick="copyLink()" style="padding:7px 14px; font-size:12px;">העתק</button>
+            </div>
+            <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn btn-green" onclick="openWhatsApp()" style="font-size:12px; padding:8px 14px;">📱 שלח ב-WhatsApp</button>
+              <button class="btn" onclick="openSMS()" style="font-size:12px; padding:8px 14px;">💬 שלח ב-SMS</button>
+            </div>
+            <div id="wa-template" style="margin-top: 14px; padding: 14px 16px; background: var(--gold-pale); border-radius: 10px; font-size: 13px; line-height: 1.8; color: var(--text);" id="msg-preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">כל האורחים + קישורים</div>
+        </div>
+        <table>
+          <thead><tr><th>שם</th><th>טלפון</th><th>סטטוס</th><th>קישור</th></tr></thead>
+          <tbody id="links-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REMINDERS -->
+    <div class="panel" id="panel-reminders">
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          <div class="card-title">תזכורות אוטומטיות</div>
+        </div>
+        <div id="reminders-list">
+          <div class="reminder-item">
+            <div>
+              <div class="reminder-title">שבועיים לפני — תזכורת ראשונה</div>
+              <div class="reminder-sub">1 ביוני 2025 · ישלח ל-<span class="confirmed-count">0</span> מאשרים</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+          </div>
+          <div class="reminder-item">
+            <div>
+              <div class="reminder-title">שלושה ימים לפני</div>
+              <div class="reminder-sub">12 ביוני 2025 · כולל פרטי חניה ודרס קוד</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+          </div>
+          <div class="reminder-item">
+            <div>
+              <div class="reminder-title">יום לפני החתונה</div>
+              <div class="reminder-sub">14 ביוני 2025 · תזכורת אחרונה</div>
+            </div>
+            <button class="toggle off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">תצוגה מקדימה של הודעת WhatsApp</div></div>
+        <div class="wa-preview">
+          שלום [שם האורח]! 🎊<br><br>
+          רק להזכיר — בשבוע הבא <strong>חתונת נועה ועומר</strong>!<br><br>
+          📅 יום ראשון, 15 ביוני 2025<br>
+          ⏰ 19:00<br>
+          📍 אולם המגדל, תל אביב<br><br>
+          מחכים לראות אותך! 💛
+        </div>
+        <div style="padding: 0 22px 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-dark" onclick="sendRemindersNow()">שלח עכשיו לכל המאשרים</button>
+          <button class="btn" onclick="showPanel('guests')">צפה ברשימת מאשרים</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">הגדרות Twilio (WhatsApp / SMS)</div></div>
+        <div style="padding: 20px 22px;">
+          <div style="font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.7;">
+            לשליחת תזכורות אוטומטיות, הכנס את פרטי Twilio שלך.<br>
+            ראה קובץ <code style="background:var(--gold-pale); padding:2px 6px; border-radius:4px; font-size:12px;">README.md</code> להוראות הגדרה.
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div>
+              <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:5px;">Account SID</label>
+              <input type="text" placeholder="ACxxxxxxxxxxxxxxxx" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:'Heebo',sans-serif; direction:ltr; outline:none; color:var(--text);">
+            </div>
+            <div>
+              <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:5px;">Auth Token</label>
+              <input type="password" placeholder="••••••••••••••••" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:'Heebo',sans-serif; direction:ltr; outline:none; color:var(--text);">
+            </div>
+          </div>
+          <div style="margin-top: 10px; font-size:12px; color:var(--muted);">
+            הגדרות אלה נשמרות ב-<code style="background:var(--gold-pale); padding:1px 5px; border-radius:3px;">config.js</code> על השרת.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================
+// DATA — נטען מ-Google Sheets
+// ============================
+const RSVP_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+const BASE_URL  = 'https://YOUR-DOMAIN.com/rsvp.html'; // ← שנה לדומיין שלך
+
+let guests = [
+  { name: 'דנה מזרחי', phone: '0501234567', status: 'yes', count: 2, allergies: 'גלוטן', note: '' },
+  { name: 'אבי שפירא', phone: '0529876543', status: 'yes', count: 1, allergies: '', note: '' },
+  { name: 'מיכל ברק', phone: '0541111222', status: 'yes', count: 3, allergies: 'בוטנים', note: 'VIP' },
+  { name: 'רבקה כהן', phone: '0534445566', status: 'pending', count: 0, allergies: '', note: '' },
+  { name: 'יוסף לוי', phone: '0507778899', status: 'pending', count: 0, allergies: '', note: '' },
+  { name: 'מנחם ברגר', phone: '0523334455', status: 'pending', count: 0, allergies: '', note: '' },
+  { name: 'ורד נחמן', phone: '0546667788', status: 'no', count: 0, allergies: '', note: '' },
+  { name: 'שמואל גנון', phone: '0532223344', status: 'yes', count: 4, allergies: 'לקטוז', note: '' },
+  { name: 'לאה פרידמן', phone: '0505556677', status: 'yes', count: 2, allergies: '', note: '' },
+  { name: 'שירה בן דוד', phone: '0541112233', status: 'yes', count: 1, allergies: 'גלוטן', note: '' },
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+// ========================
+// LOGIN
+// ========================
+// סיסמה ניתנת לשינוי כאן:
+const ADMIN_PASSWORD = 'wedding2025';
+
+function doLogin() {
+  const pass = document.getElementById('login-pass').value;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    renderAll();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ========================
+// NAV
+// ========================
+const panelTitles = {
+  dashboard: 'לוח בקרה',
+  guests: 'רשימת אורחים',
+  allergies: 'אלרגיות',
+  links: 'קישורי הזמנה',
+  reminders: 'תזכורות'
+};
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach((item, i) => {
+    const panels = ['dashboard','guests','allergies','links','reminders'];
+    item.classList.toggle('active', panels[i] === name);
+  });
+  document.getElementById('panel-title').textContent = panelTitles[name];
+  renderAll();
+}
+
+// ========================
+// RENDER
+// ========================
+function renderAll() {
+  renderStats();
+  renderGuestTable();
+  renderPendingTable();
+  renderAllergyPanel();
+  renderLinksTable();
+}
+
+function getStats() {
+  const yes = guests.filter(g => g.status === 'yes');
+  const no = guests.filter(g => g.status === 'no');
+  const pending = guests.filter(g => g.status === 'pending');
+  const totalComing = yes.reduce((s, g) => s + g.count, 0);
+  const withAllergy = yes.filter(g => g.allergies && g.allergies !== 'ללא').length;
+  return { yes: yes.length, no: no.length, pending: pending.length, totalComing, withAllergy, total: guests.length };
+}
+
+function renderStats() {
+  const s = getStats();
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">סה״כ הוזמנו</div>
+      <div class="stat-num">${s.total}</div>
+      <div class="stat-sub">משפחות / אנשים</div>
+    </div>
+    <div class="stat-card yes">
+      <div class="stat-label">אישרו הגעה</div>
+      <div class="stat-num">${s.yes}</div>
+      <div class="stat-sub">${s.totalComing} אורחים בפועל</div>
+    </div>
+    <div class="stat-card no">
+      <div class="stat-label">לא מגיעים</div>
+      <div class="stat-num">${s.no}</div>
+      <div class="stat-sub">&nbsp;</div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-label">ממתינים</div>
+      <div class="stat-num">${s.pending}</div>
+      <div class="stat-sub">לא הגיבו</div>
+    </div>`;
+  document.getElementById('total-coming').textContent = s.totalComing + ' אורחים';
+  document.getElementById('total-allergies').textContent = s.withAllergy + ' דיווחו';
+  document.querySelectorAll('.confirmed-count').forEach(el => el.textContent = s.yes);
+}
+
+function renderGuestTable() {
+  const filtered = guests.filter(g => {
+    const matchFilter = currentFilter === 'all' || g.status === currentFilter;
+    const matchSearch = !currentSearch || g.name.includes(currentSearch) || g.phone.includes(currentSearch);
+    return matchFilter && matchSearch;
+  });
+
+  document.getElementById('guest-table').innerHTML = filtered.map((g, i) => `
+    <tr>
+      <td><strong>${g.name}</strong>${g.note ? ` <span style="font-size:11px; color:var(--gold); background:var(--gold-pale); padding:1px 7px; border-radius:10px; margin-right:6px;">${g.note}</span>` : ''}</td>
+      <td style="direction:ltr; text-align:right;">${g.phone}</td>
+      <td>
+        <select onchange="updateStatus('${g.name}', this.value)" style="font-size:12px; padding:4px 8px; border:1px solid var(--border); border-radius:6px; background:#fff; font-family:'Heebo',sans-serif; color:var(--text);">
+          <option value="yes" ${g.status==='yes'?'selected':''}>✓ אישר</option>
+          <option value="no" ${g.status==='no'?'selected':''}>✗ לא מגיע</option>
+          <option value="pending" ${g.status==='pending'?'selected':''}>⏳ ממתין</option>
+        </select>
+      </td>
+      <td>${g.status==='yes' ? g.count : '—'}</td>
+      <td>${g.allergies ? `<span class="allergy-tag">${g.allergies}</span>` : '<span style="color:var(--muted);">אין</span>'}</td>
+      <td>
+        <span class="action-link" onclick="quickLink('${g.name}', '${g.phone}')">קישור</span>
+        &nbsp;
+        <span class="action-link" style="color:#B85450;" onclick="deleteGuest('${g.name}')">מחק</span>
+      </td>
+    </tr>`).join('');
+}
+
+function renderPendingTable() {
+  const pending = guests.filter(g => g.status === 'pending');
+  document.getElementById('pending-count').textContent = pending.length + ' ממתינים';
+  document.getElementById('pending-table').innerHTML = pending.map(g => `
+    <tr>
+      <td><strong>${g.name}</strong></td>
+      <td style="direction:ltr; text-align:right;">${g.phone}</td>
+      <td>
+        <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="quickLink('${g.name}', '${g.phone}')">📱 שלח קישור</button>
+      </td>
+    </tr>`).join('');
+}
+
+function renderAllergyPanel() {
+  const yes = guests.filter(g => g.status === 'yes' && g.allergies && g.allergies !== 'ללא');
+  const counts = {};
+  yes.forEach(g => {
+    g.allergies.split(',').forEach(a => {
+      const k = a.trim();
+      counts[k] = (counts[k] || 0) + g.count;
+    });
+  });
+
+  document.getElementById('allergy-summary').innerHTML =
+    Object.entries(counts).map(([a, c]) =>
+      `<div class="allergy-block"><div class="count">${c}</div><div class="name">${a}</div></div>`
+    ).join('') || '<div style="padding:8px; color:var(--muted); font-size:13px;">אין אלרגיות שדווחו</div>';
+
+  document.getElementById('allergy-table').innerHTML = yes.map(g => `
+    <tr>
+      <td><strong>${g.name}</strong></td>
+      <td>${g.allergies.split(',').map(a => `<span class="allergy-tag">${a.trim()}</span>`).join(' ')}</td>
+      <td>${g.count}</td>
+    </tr>`).join('');
+}
+
+function renderLinksTable() {
+  document.getElementById('links-table').innerHTML = guests.map(g => `
+    <tr>
+      <td><strong>${g.name}</strong></td>
+      <td style="direction:ltr; text-align:right;">${g.phone}</td>
+      <td><span class="status-badge status-${g.status}">${{yes:'✓ אישר', no:'✗ לא', pending:'⏳ ממתין'}[g.status]}</span></td>
+      <td>
+        <span class="action-link" onclick="quickLink('${g.name}', '${g.phone}')">הפק ושלח</span>
+      </td>
+    </tr>`).join('');
+}
+
+// ========================
+// ACTIONS
+// ========================
+function addGuest() {
+  const name = document.getElementById('new-name').value.trim();
+  const phone = document.getElementById('new-phone').value.trim().replace(/[-\s]/g,'');
+  const note = document.getElementById('new-note').value.trim();
+  if (!name) { showToast('נא להכניס שם'); return; }
+  guests.push({ name, phone, status: 'pending', count: 0, allergies: '', note });
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-phone').value = '';
+  document.getElementById('new-note').value = '';
+  const alert = document.getElementById('add-alert');
+  alert.style.display = 'block';
+  alert.textContent = `✓ ${name} נוסף/ה לרשימה! הפק קישור RSVP ושלח.`;
+  renderAll();
+  setTimeout(() => alert.style.display = 'none', 4000);
+}
+
+function updateStatus(name, status) {
+  const g = guests.find(g => g.name === name);
+  if (g) { g.status = status; if (status !== 'yes') g.count = 0; }
+  renderAll();
+  showToast('סטטוס עודכן');
+}
+
+function deleteGuest(name) {
+  if (!confirm(`מחק את ${name}?`)) return;
+  guests = guests.filter(g => g.name !== name);
+  renderAll();
+  showToast(`${name} הוסר/ה`);
+}
+
+function filterGuests(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGuestTable();
+}
+
+function searchGuests(val) {
+  currentSearch = val;
+  renderGuestTable();
+}
+
+function makeLink(name) {
+  return BASE_URL + '?guest=' + encodeURIComponent(name);
+}
+
+function makeMessage(name) {
+  return `שלום ${name}! 🎊\nנועה ועומר מזמינים אותך לחתונתם!\n\nאנא אשר/י הגעה דרך הקישור:\n${makeLink(name)}\n\nמחכים לראות אותך! 💛`;
+}
+
+function generateLink() {
+  const name = document.getElementById('link-name').value.trim();
+  if (!name) { showToast('נא להכניס שם'); return; }
+  const url = makeLink(name);
+  document.getElementById('link-url').textContent = url;
+  document.getElementById('link-result').style.display = 'block';
+  document.getElementById('wa-template').textContent = makeMessage(name);
+  window._linkUrl = url;
+  window._linkName = name;
+  window._linkPhone = document.getElementById('link-phone').value.trim().replace(/[-\s]/g,'');
+}
+
+function quickLink(name, phone) {
+  showPanel('links');
+  document.getElementById('link-name').value = name;
+  document.getElementById('link-phone').value = phone;
+  generateLink();
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window._linkUrl || '');
+  showToast('הקישור הועתק!');
+}
+
+function openWhatsApp() {
+  const phone = window._linkPhone || '';
+  const msg = makeMessage(window._linkName || '');
+  const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
+  window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function openSMS() {
+  const phone = window._linkPhone || '';
+  const msg = makeMessage(window._linkName || '');
+  window.open('sms:' + phone + '?body=' + encodeURIComponent(msg));
+}
+
+function sendRemindersNow() {
+  const confirmed = guests.filter(g => g.status === 'yes' && g.phone);
+  showToast(`נשלחה תזכורת ל-${confirmed.length} אורחים`);
+}
+
+function exportCSV() {
+  const rows = [['שם', 'טלפון', 'סטטוס', 'מגיעים', 'אלרגיות', 'הערה']];
+  guests.forEach(g => rows.push([g.name, g.phone, g.status, g.count, g.allergies, g.note]));
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'guests_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  showToast('הקובץ יורד...');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
