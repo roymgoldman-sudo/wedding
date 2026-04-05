@@ -715,6 +715,7 @@
         <div class="wa-preview" id="wa-preview-live" style="margin: 0 22px 16px;"></div>
         <div style="padding: 0 22px 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
           <button class="btn btn-dark" onclick="sendRemindersNow()">שלח עכשיו לכל המאשרים (<span id="send-count">0</span>)</button>
+          <button id="next-reminder-btn" class="btn btn-green" onclick="sendNextReminder()" style="display:none;">הבא</button>
           <button class="btn" onclick="showPanel('guests')">צפה ברשימת מאשרים</button>
         </div>
         <div id="send-result" style="display:none; margin: 0 22px 16px;" class="alert alert-success"></div>
@@ -1228,30 +1229,46 @@ function initReminderMsg() {
   if (sc) sc.textContent = confirmed.length;
 }
 
+let _sendQueue = [];
+let _sendIndex = 0;
+
 function sendRemindersNow() {
   const confirmed = guests.filter(g => g.status === 'yes' && g.phone);
   if (confirmed.length === 0) {
     showToast('אין אורחים שאישרו עם מספר טלפון');
     return;
   }
+  _sendQueue = confirmed;
+  _sendIndex = 0;
+  sendNextReminder();
+}
+
+function sendNextReminder() {
+  if (_sendIndex >= _sendQueue.length) {
+    const r = document.getElementById('send-result');
+    r.style.display = 'block';
+    r.textContent = `✓ נשלחו תזכורות לכל ${_sendQueue.length} האורחים!`;
+    document.getElementById('next-reminder-btn').style.display = 'none';
+    setTimeout(() => r.style.display = 'none', 5000);
+    return;
+  }
+  const g = _sendQueue[_sendIndex];
   const template = getReminderMsg();
-  let sent = 0;
-  confirmed.forEach((g, i) => {
-    setTimeout(() => {
-      const msg = template.replace('[שם]', g.name);
-      const phone = g.phone.replace(/[-\s]/g, '');
-      const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
-      window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
-      sent++;
-      if (sent === confirmed.length) {
-        const r = document.getElementById('send-result');
-        r.style.display = 'block';
-        r.textContent = `✓ נפתחו ${sent} חלונות WhatsApp — שלח כל אחד ידנית`;
-        setTimeout(() => r.style.display = 'none', 5000);
-      }
-    }, i * 800);
-  });
-  showToast(`פותח ${confirmed.length} שיחות WhatsApp...`);
+  const msg = template.replace('[שם]', g.name);
+  const phone = g.phone.replace(/[-\s]/g, '');
+  const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
+  window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
+
+  const btn = document.getElementById('next-reminder-btn');
+  _sendIndex++;
+  if (_sendIndex < _sendQueue.length) {
+    btn.style.display = 'inline-flex';
+    btn.textContent = `הבא: ${_sendQueue[_sendIndex].name} (${_sendIndex + 1}/${_sendQueue.length})`;
+  } else {
+    btn.style.display = 'none';
+    sendNextReminder();
+  }
+  showToast(`נפתח WhatsApp עבור ${g.name}`);
 }
 
 function exportCSV() {
