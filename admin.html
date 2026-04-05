@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ניהול חתונה — נועה ועומר</title>
+<title>ניהול חתונה — אליה ואחינעם</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Heebo:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -473,7 +473,7 @@
 <div id="login-screen">
   <div class="login-box">
     <div class="login-title">לוח ניהול החתונה</div>
-    <div class="login-sub">נועה ועומר &bull; 15.06.2025</div>
+    <div class="login-sub">אליה ואחינעם &bull; 15.06.2025</div>
     <input type="password" id="login-pass" placeholder="סיסמה" onkeydown="if(event.key==='Enter') doLogin()">
     <button class="login-btn" onclick="doLogin()">כניסה</button>
     <div class="login-error" id="login-error">סיסמה שגויה</div>
@@ -483,7 +483,7 @@
 <!-- Sidebar -->
 <div class="sidebar">
   <div class="sidebar-logo">
-    <div class="title">נועה ועומר</div>
+    <div class="title">אליה ואחינעם</div>
     <div class="date">15 ביוני 2025</div>
   </div>
   <nav class="nav">
@@ -501,6 +501,9 @@
     </div>
     <div class="nav-item" onclick="showPanel('reminders')">
       <span class="icon">◉</span> תזכורות
+    </div>
+    <div class="nav-item" onclick="showPanel('settings')">
+      <span class="icon">⚙</span> הגדרות
     </div>
   </nav>
   <div class="sidebar-footer">Admin Panel v1.0</div>
@@ -534,23 +537,26 @@
       </div>
 
       <div class="card">
-        <div class="card-header"><div class="card-title">אירוע בקצרה</div></div>
+        <div class="card-header">
+          <div class="card-title">אירוע בקצרה</div>
+          <button class="btn btn-sm" style="font-size:12px;padding:5px 12px;" onclick="showPanel('settings')">✏ ערוך</button>
+        </div>
         <div style="padding: 20px 22px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
           <div>
             <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">תאריך</div>
-            <div style="font-size:14px; font-weight:500;">15 יוני 2025</div>
+            <div style="font-size:14px; font-weight:500;" id="dash-date">—</div>
           </div>
           <div>
             <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">שעה</div>
-            <div style="font-size:14px; font-weight:500;">19:00</div>
+            <div style="font-size:14px; font-weight:500;" id="dash-time">—</div>
           </div>
           <div>
             <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">מקום</div>
-            <div style="font-size:14px; font-weight:500;">אולם המגדל</div>
+            <div style="font-size:14px; font-weight:500;" id="dash-venue">—</div>
           </div>
           <div>
             <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">סגירת RSVP</div>
-            <div style="font-size:14px; font-weight:500;">1 יוני 2025</div>
+            <div style="font-size:14px; font-weight:500;" id="dash-deadline">—</div>
           </div>
           <div>
             <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">מגיעים</div>
@@ -633,7 +639,7 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
             <div>
               <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:5px;">שם האורח</label>
-              <input type="text" id="link-name" placeholder="נועה כהן" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:'Heebo',sans-serif; outline:none; color:var(--text);">
+              <input type="text" id="link-name" placeholder="שם האורח" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:'Heebo',sans-serif; outline:none; color:var(--text);">
             </div>
             <div>
               <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:5px;">טלפון (אופציונלי)</label>
@@ -702,7 +708,7 @@
         <div class="card-header"><div class="card-title">תצוגה מקדימה של הודעת WhatsApp</div></div>
         <div class="wa-preview">
           שלום [שם האורח]! 🎊<br><br>
-          רק להזכיר — בשבוע הבא <strong>חתונת נועה ועומר</strong>!<br><br>
+          רק להזכיר — בשבוע הבא <strong>חתונת אליה ואחינעם</strong>!<br><br>
           📅 יום ראשון, 15 ביוני 2025<br>
           ⏰ 19:00<br>
           📍 אולם המגדל, תל אביב<br><br>
@@ -738,45 +744,186 @@
       </div>
     </div>
 
+    <!-- SETTINGS -->
+    <div class="panel" id="panel-settings">
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header"><div class="card-title">פרטי האירוע</div></div>
+        <div style="padding:24px 22px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">שם הכלה</label>
+            <input type="text" id="s-bride" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);" placeholder="אחינעם">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">שם החתן</label>
+            <input type="text" id="s-groom" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);" placeholder="אליה">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">תאריך החתונה</label>
+            <input type="date" id="s-date" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">שעת האירוע</label>
+            <input type="time" id="s-time" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">שם האולם</label>
+            <input type="text" id="s-venue" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);" placeholder="אולם המגדל">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">עיר</label>
+            <input type="text" id="s-city" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);" placeholder="תל אביב">
+          </div>
+          <div style="grid-column:1/-1;">
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">תאריך אחרון לאישור הגעה</label>
+            <input type="date" id="s-rsvp-deadline" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);">
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header"><div class="card-title">אבטחה</div></div>
+        <div style="padding:24px 22px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">סיסמה נוכחית</label>
+            <input type="password" id="s-old-pass" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);" placeholder="••••••••">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">סיסמה חדשה</label>
+            <input type="password" id="s-new-pass" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Heebo',sans-serif;outline:none;color:var(--text);" placeholder="••••••••">
+          </div>
+        </div>
+      </div>
+
+      <div id="settings-alert" style="display:none;" class="alert"></div>
+      <button class="btn btn-dark" style="padding:13px 32px;font-size:14px;" onclick="saveSettings()">שמור הגדרות</button>
+
+    </div>
+
   </div>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 // ============================
 // DATA — נטען מ-Google Sheets
 // ============================
 const RSVP_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
-const BASE_URL  = 'https://YOUR-DOMAIN.com/rsvp.html'; // ← שנה לדומיין שלך
+const BASE_URL  = 'https://roymgoldman-sudo.github.io/wedding/rsvp.html'; // ← שנה לדומיין שלך
 
-let guests = [
-  { name: 'דנה מזרחי', phone: '0501234567', status: 'yes', count: 2, allergies: 'גלוטן', note: '' },
-  { name: 'אבי שפירא', phone: '0529876543', status: 'yes', count: 1, allergies: '', note: '' },
-  { name: 'מיכל ברק', phone: '0541111222', status: 'yes', count: 3, allergies: 'בוטנים', note: 'VIP' },
-  { name: 'רבקה כהן', phone: '0534445566', status: 'pending', count: 0, allergies: '', note: '' },
-  { name: 'יוסף לוי', phone: '0507778899', status: 'pending', count: 0, allergies: '', note: '' },
-  { name: 'מנחם ברגר', phone: '0523334455', status: 'pending', count: 0, allergies: '', note: '' },
-  { name: 'ורד נחמן', phone: '0546667788', status: 'no', count: 0, allergies: '', note: '' },
-  { name: 'שמואל גנון', phone: '0532223344', status: 'yes', count: 4, allergies: 'לקטוז', note: '' },
-  { name: 'לאה פרידמן', phone: '0505556677', status: 'yes', count: 2, allergies: '', note: '' },
-  { name: 'שירה בן דוד', phone: '0541112233', status: 'yes', count: 1, allergies: 'גלוטן', note: '' },
-];
+let guests = [];
+
+// טוען תגובות מ-Google Sheets אוטומטית
+async function loadFromSheets() {
+  if (RSVP_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') return;
+  try {
+    const res = await fetch(RSVP_URL + '?action=getAll');
+    const data = await res.json();
+    if (data && data.guests) {
+      data.guests.forEach(row => {
+        const existing = guests.find(g => g.name === row.name);
+        if (!existing) {
+          guests.push({
+            name: row.name || '',
+            phone: row.phone || '',
+            status: row.answer === 'כן ✓' ? 'yes' : row.answer === 'לא ✗' ? 'no' : 'pending',
+            count: parseInt(row.count) || 0,
+            allergies: row.allergies || '',
+            note: ''
+          });
+        }
+      });
+      renderAll();
+    }
+  } catch(e) {}
+}
 
 let currentFilter = 'all';
 let currentSearch = '';
 
 // ========================
+// SETTINGS — נשמר בדפדפן
+// ========================
+const DEFAULT_SETTINGS = {
+  bride: 'אחינעם',
+  groom: 'אליה',
+  date: '2025-06-15',
+  time: '19:00',
+  venue: 'אולם המגדל',
+  city: 'תל אביב',
+  rsvpDeadline: '2025-06-01',
+  password: 'briner'
+};
+
+function getSettings() {
+  try {
+    const saved = localStorage.getItem('weddingSettings');
+    return saved ? Object.assign({}, DEFAULT_SETTINGS, JSON.parse(saved)) : DEFAULT_SETTINGS;
+  } catch(e) { return DEFAULT_SETTINGS; }
+}
+
+function saveSettings() {
+  const settings = getSettings();
+  const oldPass = document.getElementById('s-old-pass').value;
+  const newPass = document.getElementById('s-new-pass').value;
+  const alert = document.getElementById('settings-alert');
+
+  const updated = {
+    bride: document.getElementById('s-bride').value.trim() || settings.bride,
+    groom: document.getElementById('s-groom').value.trim() || settings.groom,
+    date: document.getElementById('s-date').value || settings.date,
+    time: document.getElementById('s-time').value || settings.time,
+    venue: document.getElementById('s-venue').value.trim() || settings.venue,
+    city: document.getElementById('s-city').value.trim() || settings.city,
+    rsvpDeadline: document.getElementById('s-rsvp-deadline').value || settings.rsvpDeadline,
+    password: settings.password
+  };
+
+  if (newPass) {
+    if (oldPass !== settings.password) {
+      alert.className = 'alert'; alert.style.background='#FDF2F2'; alert.style.color='#8B3330'; alert.style.border='1px solid #F0C0C0';
+      alert.style.display='block'; alert.textContent='❌ הסיסמה הנוכחית שגויה'; return;
+    }
+    updated.password = newPass;
+  }
+
+  localStorage.setItem('weddingSettings', JSON.stringify(updated));
+  applySettings(updated);
+  alert.className='alert'; alert.style.background='#F0F7F2'; alert.style.color='#2D5A3D'; alert.style.border='1px solid #B8D9C0';
+  alert.style.display='block'; alert.textContent='✓ ההגדרות נשמרו בהצלחה!';
+  document.getElementById('s-old-pass').value = '';
+  document.getElementById('s-new-pass').value = '';
+  setTimeout(() => alert.style.display='none', 3000);
+}
+
+function applySettings(s) {
+  const dateStr = s.date ? new Date(s.date).toLocaleDateString('he-IL', {day:'numeric',month:'long',year:'numeric'}) : '';
+  document.querySelector('.sidebar-logo .title').textContent = s.bride + ' ו' + s.groom;
+  document.querySelector('.sidebar-logo .date').textContent = dateStr;
+  document.querySelector('.login-sub').textContent = s.bride + ' ו' + s.groom + ' • ' + dateStr;
+}
+
+function loadSettingsToForm() {
+  const s = getSettings();
+  document.getElementById('s-bride').value = s.bride;
+  document.getElementById('s-groom').value = s.groom;
+  document.getElementById('s-date').value = s.date;
+  document.getElementById('s-time').value = s.time;
+  document.getElementById('s-venue').value = s.venue;
+  document.getElementById('s-city').value = s.city;
+  document.getElementById('s-rsvp-deadline').value = s.rsvpDeadline;
+}
+
+// ========================
 // LOGIN
 // ========================
-// סיסמה ניתנת לשינוי כאן:
-const ADMIN_PASSWORD = 'wedding2025';
-
 function doLogin() {
   const pass = document.getElementById('login-pass').value;
-  if (pass === ADMIN_PASSWORD) {
+  const settings = getSettings();
+  if (pass === settings.password) {
     document.getElementById('login-screen').style.display = 'none';
+    applySettings(settings);
     renderAll();
+    loadFromSheets();
   } else {
     document.getElementById('login-error').style.display = 'block';
   }
@@ -786,6 +933,13 @@ document.getElementById('login-pass').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
 });
 
+// הצג שמות בדף הלוגין לפי הגדרות שמורות
+(function() {
+  const s = getSettings();
+  const dateStr = s.date ? new Date(s.date).toLocaleDateString('he-IL', {day:'numeric',month:'long',year:'numeric'}) : '';
+  document.querySelector('.login-sub').textContent = s.bride + ' ו' + s.groom + ' • ' + dateStr;
+})();
+
 // ========================
 // NAV
 // ========================
@@ -794,18 +948,21 @@ const panelTitles = {
   guests: 'רשימת אורחים',
   allergies: 'אלרגיות',
   links: 'קישורי הזמנה',
-  reminders: 'תזכורות'
+  reminders: 'תזכורות',
+  settings: 'הגדרות'
 };
 
 function showPanel(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach((item, i) => {
-    const panels = ['dashboard','guests','allergies','links','reminders'];
+    const panels = ['dashboard','guests','allergies','links','reminders','settings'];
     item.classList.toggle('active', panels[i] === name);
   });
   document.getElementById('panel-title').textContent = panelTitles[name];
-  renderAll();
+  if (name === 'settings') loadSettingsToForm();
+  else renderAll();
+
 }
 
 // ========================
@@ -854,6 +1011,16 @@ function renderStats() {
   document.getElementById('total-coming').textContent = s.totalComing + ' אורחים';
   document.getElementById('total-allergies').textContent = s.withAllergy + ' דיווחו';
   document.querySelectorAll('.confirmed-count').forEach(el => el.textContent = s.yes);
+
+  // עדכן פרטי אירוע מהגדרות
+  const cfg = getSettings();
+  const fmt = d => d ? new Date(d).toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'}) : '—';
+  if (document.getElementById('dash-date')) {
+    document.getElementById('dash-date').textContent = fmt(cfg.date);
+    document.getElementById('dash-time').textContent = cfg.time || '—';
+    document.getElementById('dash-venue').textContent = (cfg.venue||'') + (cfg.city ? ', '+cfg.city : '');
+    document.getElementById('dash-deadline').textContent = fmt(cfg.rsvpDeadline);
+  }
 }
 
 function renderGuestTable() {
@@ -982,7 +1149,9 @@ function makeLink(name) {
 }
 
 function makeMessage(name) {
-  return `שלום ${name}! 🎊\nנועה ועומר מזמינים אותך לחתונתם!\n\nאנא אשר/י הגעה דרך הקישור:\n${makeLink(name)}\n\nמחכים לראות אותך! 💛`;
+  const s = getSettings();
+  const dateStr = s.date ? new Date(s.date).toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'}) : '';
+  return `שלום ${name}! 🎊\n${s.groom} ו${s.bride} מזמינים אותך לחתונתם!\n\nאנא אשר/י הגעה דרך הקישור:\n${makeLink(name)}\n\nמחכים לראות אותך! 💛`;
 }
 
 function generateLink() {
