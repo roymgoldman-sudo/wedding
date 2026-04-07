@@ -843,7 +843,7 @@
 // ============================
 // DATA — נטען מ-Google Sheets
 // ============================
-const RSVP_URL = 'https://script.google.com/macros/s/AKfycbzTcA0akbhZ9CR3dLgF67HhJKkovOMWFNtkSxb-foYv-8yzlVHac6iYPsXeFSW_WDX9/exec';
+const RSVP_URL = 'https://script.google.com/macros/s/AKfycbxhcEo30ifsbrsQ9iTz3jxpqQyDYI9O_rdr0gRSofQzB53jr0GF2R76IMIYz3Y_1-UgWA/exec';
 const BASE_URL  = 'https://roymgoldman-sudo.github.io/wedding/rsvp.html'; // ← שנה לדומיין שלך
 
 let guests = [];
@@ -1140,18 +1140,40 @@ function renderLinksTable() {
 // ========================
 // ACTIONS
 // ========================
+
+function saveGuestToSheets(guest) {
+  if (RSVP_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') return;
+  fetch(RSVP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: guest.name,
+      phone: guest.phone || '',
+      answer: guest.status === 'yes' ? 'yes' : guest.status === 'no' ? 'no' : 'pending',
+      count: guest.count || 0,
+      allergies: guest.allergies || '',
+      message: guest.note || '',
+      timestamp: new Date().toISOString(),
+      source: 'admin'
+    })
+  }).catch(() => {});
+}
+
 function addGuest() {
   const name = document.getElementById('new-name').value.trim();
   const phone = document.getElementById('new-phone').value.trim().replace(/[-\s]/g,'');
   const note = document.getElementById('new-note').value.trim();
   if (!name) { showToast('נא להכניס שם'); return; }
-  guests.push({ name, phone, status: 'pending', count: 0, allergies: '', note });
+  const guest = { name, phone, status: 'pending', count: 0, allergies: '', note };
+  guests.push(guest);
+  saveGuestToSheets(guest);
   document.getElementById('new-name').value = '';
   document.getElementById('new-phone').value = '';
   document.getElementById('new-note').value = '';
   const alert = document.getElementById('add-alert');
   alert.style.display = 'block';
-  alert.textContent = `✓ ${name} נוסף/ה לרשימה! הפק קישור RSVP ושלח.`;
+  alert.textContent = `✓ ${name} נוסף/ה לרשימה ונשמר/ה ב-Google Sheets!`;
   renderAll();
   setTimeout(() => alert.style.display = 'none', 4000);
 }
@@ -1207,8 +1229,10 @@ function generateLink() {
   // הוסף לרשימת האורחים אם לא קיים
   const exists = guests.find(g => g.name === name);
   if (!exists) {
-    guests.push({ name, phone, status: 'pending', count: 0, allergies: '', note: '' });
-    showToast(`${name} נוסף/ה לרשימת הממתינים`);
+    const guest = { name, phone, status: 'pending', count: 0, allergies: '', note: '' };
+    guests.push(guest);
+    saveGuestToSheets(guest);
+    showToast(`${name} נוסף/ה לרשימה ונשמר/ה`);
     renderAll();
   }
 }
@@ -1235,7 +1259,9 @@ function processBulk() {
   let added = 0;
   parsed.forEach(p => {
     if (!guests.find(g => g.name === p.name)) {
-      guests.push({ name: p.name, phone: p.phone, status: 'pending', count: 0, allergies: '', note: '' });
+      const guest = { name: p.name, phone: p.phone, status: 'pending', count: 0, allergies: '', note: '' };
+      guests.push(guest);
+      saveGuestToSheets(guest);
       added++;
     }
   });
