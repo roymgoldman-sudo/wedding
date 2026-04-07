@@ -633,6 +633,8 @@
 
     <!-- LINKS -->
     <div class="panel" id="panel-links">
+
+      <!-- 1. קישור אישי -->
       <div class="card" style="margin-bottom: 20px;">
         <div class="card-header"><div class="card-title">הפקת קישור אישי</div></div>
         <div style="padding: 20px 22px;">
@@ -642,7 +644,7 @@
               <input type="text" id="link-name" placeholder="שם האורח" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:'Heebo',sans-serif; outline:none; color:var(--text);">
             </div>
             <div>
-              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:5px;">טלפון (אופציונלי)</label>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:5px;">טלפון</label>
               <input type="tel" id="link-phone" placeholder="050-0000000" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:'Heebo',sans-serif; outline:none; color:var(--text);">
             </div>
             <button class="btn btn-dark" onclick="generateLink()">הפק קישור</button>
@@ -657,15 +659,49 @@
               <button class="btn btn-green" onclick="openWhatsApp()" style="font-size:12px; padding:8px 14px;">📱 שלח ב-WhatsApp</button>
               <button class="btn" onclick="openSMS()" style="font-size:12px; padding:8px 14px;">💬 שלח ב-SMS</button>
             </div>
-            <div id="wa-template" style="margin-top: 14px; padding: 14px 16px; background: var(--gold-pale); border-radius: 10px; font-size: 13px; line-height: 1.8; color: var(--text);" id="msg-preview"></div>
+            <div id="wa-template" style="margin-top:14px; padding:14px 16px; background:var(--gold-pale); border-radius:10px; font-size:13px; line-height:1.8; color:var(--text);"></div>
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">כל האורחים + קישורים</div>
+      <!-- 2. ייבוא רשימה בתפזורת -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header"><div class="card-title">ייבוא רשימת אורחים בבת אחת</div></div>
+        <div style="padding: 20px 22px;">
+          <div style="font-size:12px; color:var(--muted); margin-bottom:10px;">הכנס שם וטלפון בכל שורה, מופרדים בפסיק או רווח:</div>
+          <div style="font-size:11px; color:var(--muted); background:var(--gold-pale); padding:8px 12px; border-radius:8px; margin-bottom:10px; direction:ltr; text-align:left;">
+            ישראל ישראלי, 0501234567<br>
+            שרה כהן, 0529876543<br>
+            משה לוי 0541111222
+          </div>
+          <textarea id="bulk-input" placeholder="הכנס כאן את הרשימה..." style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:13px; font-family:'Heebo',sans-serif; min-height:140px; resize:vertical; outline:none; color:var(--text); direction:rtl;"></textarea>
+          <div style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button class="btn btn-dark" onclick="processBulk()">הפק קישורים לכולם</button>
+            <span id="bulk-count" style="font-size:12px; color:var(--muted);"></span>
+          </div>
+          <div id="bulk-results" style="display:none; margin-top:16px;"></div>
         </div>
+      </div>
+
+      <!-- 3. תזכורת לממתינים -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          <div class="card-title">שלח תזכורת לממתינים לאישור</div>
+          <span style="font-size:12px; color:var(--muted);" id="pending-remind-count"></span>
+        </div>
+        <div style="padding:16px 22px;">
+          <div style="font-size:12px; color:var(--muted); margin-bottom:10px;">ההודעה הבאה תישלח לכל מי שעדיין לא ענה:</div>
+          <textarea id="pending-msg" style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:13px; font-family:'Heebo',sans-serif; min-height:100px; resize:vertical; outline:none; color:var(--text); direction:rtl;"></textarea>
+          <div style="margin-top:10px;">
+            <button class="btn btn-dark" onclick="showPendingLinks()">הצג קישורי שליחה לממתינים</button>
+          </div>
+          <div id="pending-links-box" style="display:none; margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <!-- 4. כל האורחים -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">כל האורחים + קישורים</div></div>
         <table>
           <thead><tr><th>שם</th><th>טלפון</th><th>סטטוס</th><th>קישור</th></tr></thead>
           <tbody id="links-table"></tbody>
@@ -962,6 +998,7 @@ function showPanel(name) {
   document.getElementById('panel-title').textContent = panelTitles[name];
   if (name === 'settings') loadSettingsToForm();
   else if (name === 'reminders') { renderAll(); setTimeout(() => { initReminderMsg(); updateSendCount(); }, 100); }
+  else if (name === 'links') { renderAll(); setTimeout(initLinksPanel, 100); }
   else renderAll();
 
 }
@@ -1158,13 +1195,102 @@ function makeMessage(name) {
 function generateLink() {
   const name = document.getElementById('link-name').value.trim();
   if (!name) { showToast('נא להכניס שם'); return; }
+  const phone = document.getElementById('link-phone').value.trim().replace(/[-\s]/g,'');
   const url = makeLink(name);
   document.getElementById('link-url').textContent = url;
   document.getElementById('link-result').style.display = 'block';
   document.getElementById('wa-template').textContent = makeMessage(name);
   window._linkUrl = url;
   window._linkName = name;
-  window._linkPhone = document.getElementById('link-phone').value.trim().replace(/[-\s]/g,'');
+  window._linkPhone = phone;
+
+  // הוסף לרשימת האורחים אם לא קיים
+  const exists = guests.find(g => g.name === name);
+  if (!exists) {
+    guests.push({ name, phone, status: 'pending', count: 0, allergies: '', note: '' });
+    showToast(`${name} נוסף/ה לרשימת הממתינים`);
+    renderAll();
+  }
+}
+
+function processBulk() {
+  const raw = document.getElementById('bulk-input').value.trim();
+  if (!raw) return;
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+  const parsed = lines.map(line => {
+    const parts = line.split(/[,،\t]/).map(p => p.trim());
+    let name = '', phone = '';
+    if (parts.length >= 2) {
+      name = parts[0];
+      phone = parts[1].replace(/[-\s]/g,'');
+    } else {
+      const m = line.match(/(\d{9,10})/);
+      if (m) { phone = m[1]; name = line.replace(m[0],'').replace(/[,،]/g,'').trim(); }
+      else name = line;
+    }
+    return { name, phone };
+  }).filter(p => p.name);
+
+  // הוסף לרשימה
+  let added = 0;
+  parsed.forEach(p => {
+    if (!guests.find(g => g.name === p.name)) {
+      guests.push({ name: p.name, phone: p.phone, status: 'pending', count: 0, allergies: '', note: '' });
+      added++;
+    }
+  });
+
+  document.getElementById('bulk-count').textContent = `${parsed.length} אורחים | ${added} חדשים נוספו לרשימה`;
+
+  const box = document.getElementById('bulk-results');
+  box.style.display = 'block';
+  box.innerHTML = parsed.map(p => {
+    const url = makeLink(p.name);
+    const msg = makeMessage(p.name);
+    const num = p.phone.startsWith('0') ? '972' + p.phone.slice(1) : p.phone;
+    const waUrl = num ? 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg) : null;
+    return `<div style="display:flex; align-items:center; gap:10px; padding:9px 14px; margin-bottom:6px; background:var(--gold-pale); border-radius:9px; flex-wrap:wrap;">
+      <span style="font-weight:500; font-size:14px; flex:1;">${p.name}</span>
+      <span style="font-size:12px; color:var(--muted);">${p.phone || 'אין טלפון'}</span>
+      <button onclick="navigator.clipboard.writeText('${url}'); showToast('הועתק!')" style="font-size:11px; padding:4px 10px; border-radius:6px; border:1px solid var(--border); background:#fff; cursor:pointer; font-family:'Heebo',sans-serif;">העתק קישור</button>
+      ${waUrl ? `<a href="${waUrl}" target="_blank" style="font-size:11px; padding:4px 10px; border-radius:6px; background:#25D366; color:#fff; text-decoration:none;">📱 WhatsApp</a>` : ''}
+    </div>`;
+  }).join('');
+
+  renderAll();
+}
+
+function showPendingLinks() {
+  const pending = guests.filter(g => g.status === 'pending' && g.phone);
+  const msg = document.getElementById('pending-msg').value.trim();
+  const box = document.getElementById('pending-links-box');
+  if (pending.length === 0) { showToast('אין ממתינים עם טלפון'); return; }
+
+  box.style.display = 'block';
+  box.innerHTML = pending.map(g => {
+    const s = getSettings();
+    const reminder = msg || `שלום ${g.name}! 🎊\n${s.groom} ו${s.bride} מזמינים אותך לחתונתם!\nאנא אשר/י הגעה:\n${makeLink(g.name)}`;
+    const phone = String(g.phone).replace(/[-\s]/g,'');
+    const num = phone.startsWith('0') ? '972' + phone.slice(1) : phone;
+    const personalMsg = reminder.replace('[שם]', g.name);
+    const waUrl = 'https://wa.me/' + num + '?text=' + encodeURIComponent(personalMsg);
+    return `<a href="${waUrl}" target="_blank" style="display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:6px; background:#FEF9EE; border:1px solid #F0D88A; border-radius:10px; text-decoration:none; color:#8B6320;">
+      <span style="font-size:16px;">⏳</span>
+      <span style="font-weight:500; font-size:14px;">${g.name}</span>
+      <span style="font-size:12px; color:#B8A060; margin-right:auto;">${g.phone}</span>
+    </a>`;
+  }).join('');
+}
+
+function initLinksPanel() {
+  const pending = guests.filter(g => g.status === 'pending');
+  const el = document.getElementById('pending-remind-count');
+  if (el) el.textContent = `${pending.length} ממתינים`;
+  const s = getSettings();
+  const pmsg = document.getElementById('pending-msg');
+  if (pmsg && !pmsg.value) {
+    pmsg.value = `שלום [שם]! 🎊\n${s.groom} ו${s.bride} מזמינים אותך לחתונתם!\nאנא אשר/י הגעה דרך הקישור האישי שלך.\nמחכים לראות אותך! 💛`;
+  }
 }
 
 function quickLink(name, phone) {
